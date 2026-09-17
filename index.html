@@ -187,7 +187,7 @@ svg.chart{width:100%;height:auto;display:block;}
       <span class="chip" id="chipFecha">Actualizado: &mdash;</span>
     </div>
   </div>
-<div class="subnav"><a href="#p-resumen">Escenarios de tipo oficial</a><a href="#s-swap10">Swap 10a SOFR</a><a href="#s-curva">Curva swap</a><a href="#s-dots">Dot plot</a><a href="#s-mercado">Mercado implícito</a><a href="#p-sentimiento">Sentimiento IA</a></div>
+<div class="subnav"><a href="#p-resumen">Escenarios de tipo oficial</a><a href="#s-swap10">Swap 10a SOFR</a><a href="#s-curva">Curva swap</a><a href="#s-dots">Dot plot</a><a href="#s-mercado">Implícito en mercado</a><a href="#p-sentimiento">Sentimiento IA</a></div>
   <section class="tk" id="tkBlock"></section>
   <div class="kpirow" id="kpirow"></div>
   
@@ -258,9 +258,9 @@ svg.chart{width:100%;height:auto;display:block;}
     </div>
       <div class="card" id="cDots"></div>
       
-    </div><div><div class="sectitle" id="s-mercado"><span class="bar"></span><h2 id="wirpH2">Tipos implícitos de mercado por reunión (WIRP)</h2><span class="st" id="wirpSub">Reuniones 2026-2027</span></div>
+    </div><div><div class="sectitle" id="s-mercado"><span class="bar"></span><h2 id="wirpH2">Implícito en mercado</h2><span class="st" id="wirpSub">Reuniones 2026-2027</span></div>
     <div class="comment">
-      <span id="noteWirp">Con el tipo ya en 3,75–4,00 %, el mercado descuenta que el ciclo sigue: 4,01 % el 28-oct, 4,21 % el 9-dic y un <strong>pico de ~4,65 % en sep-2027</strong>, es decir <strong>unas tres subidas más</strong> de 25 pb. La de diciembre está prácticamente puesta en precio (77,9 %). Solo a partir de oct-27 aparecen probabilidades negativas, que se leen como sesgo neto a bajada en esa reunión.</span>
+      <span id="noteWirp">Con el tipo ya en 3,75–4,00 %, el mercado descuenta que el ciclo sigue: 4,01 % el 28-oct, 4,21 % el 9-dic y un <strong>pico de ~4,65 % en sep-2027</strong>, es decir <strong>unas tres subidas más</strong> de 25 pb. Ojo con la lectura de la columna de probabilidad: es <strong>adicional por reunión</strong>, no acumulada. Al 53,1 % del 28-oct se le suma un 77,9 % el 9-dic, de forma que a cierre de 2026 el mercado tiene descontados <strong>+33 pb</strong>, algo más de una subida completa. Solo a partir de oct-27 aparecen probabilidades negativas, que se leen como sesgo neto a bajada en esa reunión.</span>
     </div>
       <div class="card" id="cWirp"></div>
     </div></div>
@@ -850,13 +850,13 @@ async function parseWorkbook(buf){
   }catch(e){ out.warnings.push('Curva swap: '+e.message); }
 
   try{
-    const ws=await findSheet('2. ELGC Analistas','2.');
+    const ws=await findSheet('2. Analistas','2.');
     if(!ws) throw new Error('hoja no encontrada');
     const d26=[],d27=[]; let r=4;
     while(_cell(ws,r,1)!=null&&_cell(ws,r,1)!==''){ const a=_cell(ws,r,4),b=_cell(ws,r,5); if(typeof a==='number')d26.push(a); if(typeof b==='number')d27.push(b); r++; }
     if(!d26.length&&!d27.length) throw new Error('vacía o con otro formato');
     out.elgc26=_median(d26); out.n26=d26.length; out.elgc27=_median(d27); out.n27=d27.length;
-  }catch(e){ out.warnings.push('ELGC analistas: '+e.message); }
+  }catch(e){ out.warnings.push('Consenso analistas: '+e.message); }
 
   if(!out.WIRP&&!out.CURVE&&!out.SWAP10&&out.level==null) throw new Error('No se reconoció ninguna hoja esperada en este Excel.');
   return out;
@@ -935,9 +935,9 @@ const NOTES0={wirp:document.getElementById('noteWirp').innerHTML,dots:document.g
 function getStored(code){ if(code==='FED'&&typeof window!=='undefined'&&window.__BAKED__) return window.__BAKED__; try{const s=localStorage.getItem(lsKey(code)); if(s) return JSON.parse(s);}catch(e){} return null; }
 const TK={
 FED:{bias:'Restrictivo, al alza',bc:'hawk',
- mov:'Segunda subida de 25 pb: el mercado le da un 53 % al 28-oct y la da por hecha el 9-dic (78 %).',
+ mov:'Segunda subida de 25 pb: 53 % el 28-oct y otro 78 % adicional el 9-dic. Sumando ambas reuniones, el mercado descuenta +33 pb para cierre de 2026.',
  risk:'El mercado se ha ido por encima de todos los dots en 2027: descuenta 4,58 % cuando el participante más duro del FOMC está en 4,38 %. Si la inflación cede, ese tramo es el que más tiene que corregir.',
- gap:'Mercado y Fed ya casi coinciden en 2026 (4,21 % frente a 4,13 %); la discrepancia se ha mudado a 2027, donde quedan 45 pb. El consenso (3,75 %) está desfasado: ninguna de las 74 casas ha revisado tras la reunión y ELGC cotiza el techo del rango, no el punto medio. Nuestra pauta va por debajo de las tres referencias desde 2027.',
+ gap:'Mercado y Fed ya casi coinciden en 2026 (4,21 % frente a 4,13 %); la discrepancia se ha mudado a 2027, donde quedan 45 pb. El consenso (3,75 %) está desfasado: ninguna de las 74 casas ha revisado tras la reunión y la encuesta cotiza el techo del rango, no el punto medio. Nuestra pauta va por debajo de las tres referencias desde 2027.',
  msg:'Ya no se discute si la Fed sube, sino dónde para.'},
 BCE:{bias:'Restrictivo, al alza',bc:'hawk',
  mov:'Sin señal para el Consejo del 10 sep. El mercado ve 2,60 % a fin de 2026, 35 pb por encima de hoy.',
@@ -1083,9 +1083,9 @@ function setBank(code){
   const topic=document.getElementById('sentTopicCard');
   topic.innerHTML='<img id="imgStack" src="'+(d.sentStack||'')+'" alt="Descomposición del sentimiento" style="width:100%;height:auto;display:block;border-radius:8px;">';
   {const _td=$id('tabDots');if(_td)_td.textContent=d.tab3;}
-  const labels={FED:['Mercado','Fed (mediana dots)','Consenso (Bloomberg)','Reunión FOMC','Prob. subida (%)'],BCE:['Mercado (OIS)','Proyección BCE','Consenso (Bloomberg)','Reunión del Consejo BCE','Prob. cambio (%)'],BOE:['Mercado (OIS)','Proyección BoE','Consenso (Bloomberg)','Reunión del MPC','Prob. cambio (%)'],BCB:['CDI estimado (CDIE)','—','Focus','Reunión del COPOM','Cambio implícito (pb)']}[code];
+  const labels={FED:['Mercado','Fed (mediana dots)','Consenso (Bloomberg)','Reunión FOMC','Prob. subida en la reunión (%)'],BCE:['Mercado (OIS)','Proyección BCE','Consenso (Bloomberg)','Reunión del Consejo BCE','Prob. cambio en la reunión (%)'],BOE:['Mercado (OIS)','Proyección BoE','Consenso (Bloomberg)','Reunión del MPC','Prob. cambio en la reunión (%)'],BCB:['CDI estimado (CDIE)','—','Focus','Reunión del COPOM','Cambio implícito (pb)']}[code];
   document.getElementById('sendasM').textContent=labels[0];document.getElementById('sendasO').textContent=labels[1];document.getElementById('sendasC').textContent=labels[2];const hasOff=labels[1]!=='—'&&(BANKS[code].SENDAS||[]).some(r=>typeof r.dots==='number'&&isFinite(r.dots));window.SHOW_OFF=hasOff;document.getElementById('sendasO').style.display=hasOff?'':'none';
-  $id('wirpMeeting').textContent=labels[3];$id('wirpMetric').textContent=labels[4];const heads={FED:['Escenarios de tipo oficial','Mercado implícito','Swap 10a SOFR'],BCE:['Escenarios de tipo oficial','Mercado implícito','Swap 10a Euribor 6M'],BOE:['Escenarios de tipo oficial','Mercado implícito','Swap 10a SONIA'],BCB:['Escenarios de tipo oficial','Mercado implícito','Swap 10a DI pré']}[code];document.getElementById('sendasH2').textContent=heads[0];document.getElementById('wirpH2').textContent=heads[1];document.getElementById('swap10H2').textContent=heads[2];const cw=document.getElementById('cCurve').parentElement;if(cw)cw.style.display=(code==='BCB'?'none':'');renderTK(code);renderSendasRead(code);render10yRead(code);document.getElementById('wirpSub').textContent=code==='BCB'?'CDI estimado / CDIE por reunión del COPOM':'Reuniones 2026-2027';
+  $id('wirpMeeting').textContent=labels[3];$id('wirpMetric').textContent=labels[4];const heads={FED:['Escenarios de tipo oficial','Implícito en mercado','Swap 10a SOFR'],BCE:['Escenarios de tipo oficial','Implícito en mercado','Swap 10a Euribor 6M'],BOE:['Escenarios de tipo oficial','Implícito en mercado','Swap 10a SONIA'],BCB:['Escenarios de tipo oficial','Implícito en mercado','Swap 10a DI pré']}[code];document.getElementById('sendasH2').textContent=heads[0];document.getElementById('wirpH2').textContent=heads[1];document.getElementById('swap10H2').textContent=heads[2];const cw=document.getElementById('cCurve').parentElement;if(cw)cw.style.display=(code==='BCB'?'none':'');renderTK(code);renderSendasRead(code);render10yRead(code);document.getElementById('wirpSub').textContent=code==='BCB'?'CDI estimado / CDIE por reunión del COPOM':'Reuniones 2026-2027';
   const notes={BCE:{Sendas:'Comparación homogénea entre <strong>mercado</strong>, proyecciones disponibles del <strong>BCE</strong> y <strong>consenso de Bloomberg</strong>. Cuando no existe una previsión oficial directamente comparable, la columna se deja vacía.',Wirp:'El mercado OIS refleja el tipo implícito por reunión del Consejo de Gobierno; las probabilidades se interpretan como señal de cambio implícita en esa reunión.',Curve:'Curva swap basada en <strong>Euribor 6M</strong>, no en €STR.',Dots:'El BCE no publica un dot plot; esta pestaña muestra las <strong>proyecciones macroeconómicas del staff</strong>.'},BOE:{Sendas:'Comparación entre <strong>mercado OIS</strong>, información oficial disponible del <strong>BoE</strong> y <strong>consenso de Bloomberg</strong>. No se atribuyen proyecciones a un banco que no los publica.',Wirp:'El mercado OIS muestra el tipo implícito por reunión del <strong>MPC</strong> y su señal de cambio esperada.',Curve:'Curva swap en libras basada en la referencia <strong>SONIA</strong>.',Dots:'El BoE no publica un dot plot; esta pestaña muestra el <strong>reparto de votos del MPC</strong>.'},BCB:{Sendas:'El BCB no dispone de tipos implícitos de Bloomberg en esta metodología. Se usa <strong>CDI estimado (CDIE)</strong> para la senda de mercado y la <strong>Encuesta Focus</strong> para el consenso.',Wirp:'La tabla no muestra probabilidades: muestra el <strong>cambio implícito del COPOM en puntos básicos</strong> y el nivel de CDI estimado.',Curve:'No se muestra una curva hasta disponer de un identificador Bloomberg validado para pré x DI; se evita presentar un bloque vacío como si faltara carga.',Dots:'El BCB no publica dots; esta pestaña muestra la <strong>Encuesta Focus</strong>, incluyendo 2026, 2027 y 2028.'}};
   const n=notes[code]||{}; ['Wirp','Dots'].forEach(k=>document.getElementById('note'+k).innerHTML=code==='FED'?NOTES0[k.toLowerCase()]:n[k]);
   const pj=BANKS[code].proj; const DL=code==='FED'?{h1:'Dot plot',st1:'punto medio del tipo objetivo por participante · %, fin de año',h2:'Distribución de dots',st2:'nº de participantes',note2:NOTES0.dots2}:{h1:pj.h1,st1:pj.st1,h2:pj.h2,st2:pj.st2,note2:pj.note};
