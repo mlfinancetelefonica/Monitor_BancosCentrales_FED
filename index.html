@@ -935,7 +935,7 @@ const NOTES0={wirp:document.getElementById('noteWirp').innerHTML,dots:document.g
 function getStored(code){ if(code==='FED'&&typeof window!=='undefined'&&window.__BAKED__) return window.__BAKED__; try{const s=localStorage.getItem(lsKey(code)); if(s) return JSON.parse(s);}catch(e){} return null; }
 const TK={
 FED:{bias:'Restrictivo, al alza',bc:'hawk',
- mov:'Segunda subida de 25 pb: 53 % el 28-oct y otro 78 % adicional el 9-dic. Sumando ambas reuniones, el mercado descuenta +33 pb para cierre de 2026.',
+ mov:'Segunda subida de 25 pb: el mercado asigna un 53 % de probabilidad a que se haya materializado para la reunión del 28-oct, porcentaje que aumenta al 78 % para la reunión del 9-dic. Sumando ambas reuniones, el mercado descuenta +33 pb para cierre de 2026.',
  risk:'El mercado se ha ido por encima de todos los dots en 2027: descuenta 4,58 % cuando el participante más duro del FOMC está en 4,38 %. Si la inflación cede, ese tramo es el que más tiene que corregir.',
  gap:'Mercado y Fed ya casi coinciden en 2026 (4,21 % frente a 4,13 %); la discrepancia se ha mudado a 2027, donde quedan 45 pb. El consenso (3,75 %) está desfasado: ninguna de las 74 casas ha revisado tras la reunión y la encuesta cotiza el techo del rango, no el punto medio. Nuestra pauta va por debajo de las tres referencias desde 2027.',
  msg:'Ya no se discute si la Fed sube, sino dónde para.'},
